@@ -1,15 +1,9 @@
 package com.datasets.datasetApp.ServiceImpl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class UploadDatasetServiceImpl implements UploadDatasetService {
+	
+	Logger logger = LoggerFactory.getLogger(UploadDatasetServiceImpl.class);
 
 	@Autowired
 	DawjonesIndexRepository repository;
@@ -32,6 +28,7 @@ public class UploadDatasetServiceImpl implements UploadDatasetService {
 		      List<DawjonesIndexEntity> dawjonesIndex = CSVHelper.csvTodawjonesIndex(file.getInputStream());
 		      repository.saveAll(dawjonesIndex);
 		    } catch (Exception e) {
+		    	logger.error(e.getMessage());
 		    	throw new Exception("Error occurred while storing csv data: " + e.getMessage());
 		    }
 		

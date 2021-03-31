@@ -2,6 +2,8 @@ package com.datasets.datasetApp.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +17,14 @@ import com.datasets.datasetApp.Entity.DawjonesIndexEntity;
 import com.datasets.datasetApp.Service.AddRecordService;
 import com.datasets.datasetApp.Service.QueryDataService;
 import com.datasets.datasetApp.Service.UploadDatasetService;
-
 import com.datasets.datasetApp.util.CSVHelper;
 import com.datasets.datasetApp.util.ResponseMessage;
 
 @RestController
 public class DatasetAppController {
 	
+	Logger logger = LoggerFactory.getLogger(DatasetAppController.class);
+
 	@Autowired
 	UploadDatasetService uploadDatasetService;
 	
@@ -36,16 +39,15 @@ public class DatasetAppController {
 		
 		String message = "";
 		if (CSVHelper.hasCSVFormat(file)) {
-		
-		try {
-			uploadDatasetService.uploadDataset(file);
-			
-	        message = "File successfully uploaded: " + file.getOriginalFilename();
-	        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
-	      } catch (Exception e) {
-	        message = "File could not be uploaded: " + file.getOriginalFilename() + "!";
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage(message));
-	      }
+			try {
+				uploadDatasetService.uploadDataset(file);
+				message = "File successfully uploaded: " + file.getOriginalFilename();
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+			}catch (Exception e) {
+				logger.error(e.getMessage());
+				message = "File could not be uploaded: " + file.getOriginalFilename();
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage(message));
+			}
 		}
 		message = "Bad file format, upload a csv file";
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
@@ -65,8 +67,8 @@ public class DatasetAppController {
 			
 			return new ResponseEntity<>(dawjonesIndex, HttpStatus.OK);
 		}catch (Exception e) {
-			System.out.println(e.getStackTrace());
-		      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			logger.error(e.getMessage());
+		    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}
 	
@@ -74,16 +76,15 @@ public class DatasetAppController {
 	public ResponseEntity<ResponseMessage> addRecord(@RequestParam("file") MultipartFile file) {
 		String message = "";
 		if (CSVHelper.hasCSVFormat(file)) {
-		
-		try {
-			addRecordService.addRecord(file);
-			
-	        message = "Successfully added the record";
-	        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
-	      } catch (Exception e) {
-	        message = "Record could not be added";
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage(message));
-	      }
+			try {
+				addRecordService.addRecord(file);
+				message = "Successfully added the record";
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+			}catch (Exception e) {
+				logger.error(e.getMessage());
+				message = "Record could not be added";
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage(message));
+			}
 		}
 		message = "Bad file format, upload a csv file";
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));

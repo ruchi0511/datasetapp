@@ -9,17 +9,19 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.datasets.datasetApp.Entity.DawjonesIndexEntity;
 
 public class CSVHelper {
-
-	public static String TYPE = "text/csv";
 	
+	static Logger logger = LoggerFactory.getLogger(CSVHelper.class);
+
 	public static boolean hasCSVFormat(MultipartFile file) {
 
-	    if (!TYPE.equals(file.getContentType())) {
+	    if (!"text/csv".equals(file.getContentType())) {
 	      return false;
 	    }
 
@@ -27,13 +29,12 @@ public class CSVHelper {
 	  }
 	
 	public static List<DawjonesIndexEntity> csvTodawjonesIndex(InputStream is) throws Exception {
-
-		try (BufferedReader fileReader = new BufferedReader(
+		
+		try (
+				BufferedReader fileReader = new BufferedReader(
 				new InputStreamReader(is, "UTF-8"));
-				CSVParser csvParser = new CSVParser(fileReader,
-						CSVFormat.DEFAULT.withFirstRecordAsHeader()
-								.withIgnoreHeaderCase().withTrim());) {
-
+				CSVParser csvParser = new CSVParser(fileReader,CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());
+				){
 			List<DawjonesIndexEntity> dawjonesIndex = new ArrayList<DawjonesIndexEntity>();
 
 			Iterable<CSVRecord> csvRecords = csvParser.getRecords();
@@ -72,8 +73,8 @@ public class CSVHelper {
 				if(csvRecord.get("percent_return_next_dividend") != null && !csvRecord.get("percent_return_next_dividend").equals("")){
 					nextDiv = Double.parseDouble(csvRecord.get("percent_return_next_dividend"));
 				}
+				
 				DawjonesIndexEntity dawjonesIndexEntity = new DawjonesIndexEntity(
-
 						quarter,
 						csvRecord.get("stock"),
 						csvRecord.get("date"),
@@ -98,6 +99,7 @@ public class CSVHelper {
 
 			return dawjonesIndex;
 		} catch (Exception e) {
+			logger.error(e.getMessage());
 			throw new Exception("Error occurred while parsing CSV file: "+ e.getMessage());
 		}
 
