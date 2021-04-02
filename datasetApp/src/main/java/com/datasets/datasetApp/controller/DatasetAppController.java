@@ -77,8 +77,8 @@ public class DatasetAppController {
 		String message = "";
 		if (CSVHelper.hasCSVFormat(file)) {
 			try {
-				addRecordService.addRecord(file);
-				message = "Successfully added the record";
+				message = addRecordService.addRecord(file);
+				//message = "Successfully added the record";
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
 			}catch (Exception e) {
 				logger.error(e.getMessage());

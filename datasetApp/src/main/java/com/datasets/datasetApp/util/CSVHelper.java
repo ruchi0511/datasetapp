@@ -30,11 +30,11 @@ public class CSVHelper {
 	
 	public static List<DawjonesIndexEntity> csvTodawjonesIndex(InputStream is) throws Exception {
 		
-		try (
-				BufferedReader fileReader = new BufferedReader(
-				new InputStreamReader(is, "UTF-8"));
-				CSVParser csvParser = new CSVParser(fileReader,CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());
-				){
+		try {
+			
+			BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+			CSVParser csvParser = new CSVParser(fileReader,CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());
+			
 			List<DawjonesIndexEntity> dawjonesIndex = new ArrayList<DawjonesIndexEntity>();
 
 			Iterable<CSVRecord> csvRecords = csvParser.getRecords();

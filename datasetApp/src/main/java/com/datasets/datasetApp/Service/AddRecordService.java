@@ -6,5 +6,5 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public interface AddRecordService {
 
-	void addRecord(MultipartFile file) throws Exception;
+	String addRecord(MultipartFile file) throws Exception;
 }

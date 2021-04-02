@@ -1,6 +1,7 @@
 package com.datasets.datasetApp.ServiceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +23,32 @@ public class AddRecordServiceImpl implements AddRecordService{
 	DawjonesIndexRepository repository;
 	
 	@Override
-	public void addRecord(MultipartFile file) throws Exception {
+	public String addRecord(MultipartFile file) throws Exception {
 		try {
 		      List<DawjonesIndexEntity> dawjonesIndex = CSVHelper.csvTodawjonesIndex(file.getInputStream());
-		      repository.save(dawjonesIndex.get(0));
+		      String msg;
+		      if(dawjonesIndex.isEmpty()){
+		    	  msg = "No record present in csv file";
+		    	  return msg;
+		      }
+		      DawjonesIndexEntity dawjonesIndexEntity = dawjonesIndex.get(0);
+		      
+		      String stock = dawjonesIndexEntity.getStock();
+		      String date = dawjonesIndexEntity.getDate();
+		      Optional<DawjonesIndexEntity> optional = repository.findByStockAndDate(stock, date);
+		      
+		      
+		      if(!optional.isPresent()){
+		    	  repository.save(dawjonesIndexEntity);
+		    	  msg = "Record added successfully";
+		    	  logger.info(msg);
+
+		      }else{
+		    	  msg = "Record for stock :"+stock+" for the week of :"+date+" already present";
+		    	  logger.info(msg);
+		      }
+		      
+		    return msg;  
 		    } catch (Exception e) {
 		    	logger.error(e.getMessage());
 		    	throw new Exception("Error occurred while storing csv data: " + e.getMessage());
